@@ -1,7 +1,6 @@
 package org.severstal.controller;
 
 import org.severstal.dto.SupplierPriceRequestDto;
-import org.severstal.entity.Product;
 import org.severstal.entity.SupplierPrice;
 import org.severstal.service.SupplierPriceService;
 import org.springframework.http.ResponseEntity;

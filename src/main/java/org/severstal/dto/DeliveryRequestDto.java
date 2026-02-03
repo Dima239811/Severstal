@@ -1,6 +1,7 @@
 package org.severstal.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class DeliveryRequestDto {
     private Long supplierId;
 
@@ -16,10 +18,4 @@ public class DeliveryRequestDto {
     private LocalDate deliveryDate;
 
     private List<DeliveryItemDto> items;
-
-    public DeliveryRequestDto(Long supplierId, LocalDate deliveryDate, List<DeliveryItemDto> items) {
-        this.supplierId = supplierId;
-        this.deliveryDate = deliveryDate;
-        this.items = items;
-    }
 }

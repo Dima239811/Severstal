@@ -21,9 +21,7 @@ public class ReportService {
 
     public List<ReportDto> getReport(LocalDate from, LocalDate to) {
         log.debug("Выполняем запрос в репозиторий: from={}, to={}", from, to);
-
         List<ReportDto> report = itemRepository.findReport(from, to);
-
         log.info("Отчёт сформирован. Строк: {}", report.size());
         return report;
     }

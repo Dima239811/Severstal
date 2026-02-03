@@ -20,5 +20,4 @@ public interface DeliveryItemRepository extends JpaRepository<DeliveryItem, Long
             "WHERE di.delivery.deliveryDate BETWEEN :from AND :to " +
             "GROUP BY di.delivery.supplier.id, di.delivery.supplier.name, di.product.type, di.product.kind")
     List<ReportDto> findReport(@Param("from") LocalDate from, @Param("to") LocalDate to);
-
 }

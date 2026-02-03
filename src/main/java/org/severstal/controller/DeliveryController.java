@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/deliveries")
 public class DeliveryController {
-
     private final DeliveryService deliveryService;
 
     public DeliveryController(DeliveryService deliveryService) {

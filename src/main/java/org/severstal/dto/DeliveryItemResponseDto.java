@@ -2,7 +2,6 @@ package org.severstal.dto;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.severstal.entity.Product;
 
 import java.math.BigDecimal;
 

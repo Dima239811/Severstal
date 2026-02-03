@@ -15,7 +15,6 @@ import java.util.List;
 
 @Service
 public class SupplierPriceService {
-
     private final SupplierPriceRepository priceRepository;
     private final SupplierRepository supplierRepository;
     private final ProductRepository productRepository;
