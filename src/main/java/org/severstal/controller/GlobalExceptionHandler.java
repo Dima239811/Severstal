@@ -2,8 +2,10 @@ package org.severstal.controller;
 
 import org.severstal.dto.ErrorResponse;
 import org.severstal.exception.BadRequestException;
+import org.severstal.exception.IncorrectEnumValue;
 import org.severstal.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -28,6 +30,24 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleBadRequest(BadRequestException ex) {
         log.warn("Bad request: {}", ex.getMessage());
         return new ErrorResponse(400, ex.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMessageNotReadable(HttpMessageNotReadableException ex) {
+
+        Throwable cause = ex.getCause();
+
+        while (cause != null) {
+            if (cause instanceof IncorrectEnumValue) {
+                log.warn("Incorrect enum value: {}", cause.getMessage());
+                return new ErrorResponse(400, cause.getMessage());
+            }
+            cause = cause.getCause();
+        }
+
+        log.warn("Malformed JSON: {}", ex.getMessage());
+        return new ErrorResponse(400, "Invalid request body");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
