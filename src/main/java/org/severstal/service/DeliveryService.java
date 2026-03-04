@@ -10,8 +10,8 @@ import org.severstal.repository.SupplierPriceRepository;
 import org.severstal.repository.SupplierRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -40,33 +40,33 @@ public class DeliveryService {
         delivery.setSupplier(supplier);
         delivery.setDeliveryDate(request.getDeliveryDate());
 
-        List<DeliveryItem> items = new ArrayList<>();
+        Set<Long> productIds = request.getItems().stream()
+                .map(DeliveryItemDto::getProductId)
+                .collect(Collectors.toSet());
 
-        for (DeliveryItemDto itemDto : request.getItems()) {
+        Map<Long, Product> productMap = productRepository.findAllById(productIds).
+                stream().collect(Collectors.toMap(Product::getId, p-> p));
 
-            Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new NotFoundException("Product not found"));
+        List<SupplierPrice> allPrices = supplierPriceRepository.findPrices(
+                supplier, productIds, request.getDeliveryDate());
 
-            List<SupplierPrice> prices = supplierPriceRepository
-                    .findBySupplierAndProductAndDateFromLessThanEqualAndDateToGreaterThanEqual(
-                            supplier,
-                            product,
-                            request.getDeliveryDate(),
-                            request.getDeliveryDate()
-                    );
+        Map<Long, SupplierPrice> pricesMap = allPrices.stream()
+                .collect(Collectors.toMap(sp -> sp.getProduct().getId(), sp -> sp));
 
-            SupplierPrice price = prices.stream()
-                    .findFirst()
-                    .orElseThrow(() -> new NotFoundException("Price not found for this date"));
+        List<DeliveryItem> items = request.getItems().stream().map(itemDto -> {
+            Product product = Optional.ofNullable(productMap.get(itemDto.getProductId()))
+                    .orElseThrow(() -> new NotFoundException("Product not found: " + itemDto.getProductId()));
+
+            SupplierPrice price = Optional.ofNullable(pricesMap.get(itemDto.getProductId()))
+                    .orElseThrow(() -> new NotFoundException("Price not found for product: " + itemDto.getProductId()));
 
             DeliveryItem item = new DeliveryItem();
             item.setDelivery(delivery);
             item.setProduct(product);
             item.setWeightKg(itemDto.getWeightKg());
             item.setPricePerKg(price.getPricePerKg());
-
-            items.add(item);
-        }
+            return item;
+        }).collect(Collectors.toList());
 
         delivery.setItems(items);
 

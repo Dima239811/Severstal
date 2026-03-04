@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface SupplierPriceRepository extends JpaRepository<SupplierPrice, Long> {
@@ -28,5 +29,16 @@ public interface SupplierPriceRepository extends JpaRepository<SupplierPrice, Lo
             @Param("product") Product product,
             @Param("dateFrom") LocalDate dateFrom,
             @Param("dateTo") LocalDate dateTo
+    );
+
+    @Query("SELECT sp FROM SupplierPrice sp " +
+            "WHERE sp.supplier = :supplier " +
+            "AND sp.product.id IN :productIds " +
+            "AND :date >= sp.dateFrom " +
+            "AND :date <= sp.dateTo")
+    List<SupplierPrice> findPrices(
+            @Param("supplier") Supplier supplier,
+            @Param("productIds") Collection<Long> productIds,
+            @Param("date") LocalDate date
     );
 }
